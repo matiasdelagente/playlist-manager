@@ -13,5 +13,5 @@ app.use('/', router);
 
 app.use(express.static('public'));
 
-var port = 5000;
+var port = 8888;
 app.listen(port, () => console.log(port));
