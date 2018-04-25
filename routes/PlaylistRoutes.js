@@ -1,10 +1,11 @@
 var express = require('express');
 var router = express.Router();
 var Playlist = require('../models/PlaylistModel.js');
+var Video = require('../models/VideoModel.js');
 
 router.route('/playlist')
 .get(function(req, res){
-  Playlist.find(function(err, data){
+  Playlist.find(function(err, data) {
     if(err) res.json(err);
     res.json(data);
   });
@@ -16,7 +17,7 @@ router.route('/playlist')
   playlist.description = req.body.description;
   playlist.views = 0;
 
-  playlist.save(function(err, data){
+  playlist.save(function(err, data) {
     if(err) res.json(err);
     res.json(data);
   });
@@ -25,19 +26,36 @@ router.route('/playlist')
 router.route('/playlist/:id')
 .get(function(req, res){
   var id = req.params.id;
-  Playlist.findById(id, function(err, data){
+
+  Playlist.findById(id, function(err, playlist) {
     if(err) res.send(err);
-    res.json(data);
-  });
+
+    playlist.views += 1;
+    playlist.save(function(err, data){
+      if(err) res.json(err);
+
+      res.json(playlist);
+    })
+  }).populate('videos');
 })
 .post(function(req, res){
-  var id = req.params.id;
-  Playlist.findById(id, function(err, product){
+  var video = new Video();
+  video.creator = req.body.creator;
+  video.videoUrl = req.body.videoUrl;
+  video.description = req.body.description;
+
+  video.save(function(err, data){
     if(err) res.json(err);
-    playlist.videos = req.body.videos;
-    playlist.save(function(err, data) {
+
+    var id = req.params.id;
+    Playlist.findById(id, function(err, playlist) {
       if(err) res.json(err);
-      res.json(data);
+      
+      playlist.videos.push(data._id);
+      playlist.save(function(err, newPlaylist){
+        if(err) res.json(err);
+        res.json(data);
+      });
     });
   });
 });
