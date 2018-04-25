@@ -36,7 +36,7 @@ class Playlist extends Component {
       .then(response => response.json())
       .then(data => {
         const videos = [...this.state.playlist.videos, data]
-        const updatedPlayList = { ...this.playlist, videos: videos }
+        const updatedPlayList = { ...this.state.playlist, videos: videos }
 
         this.setState({ playlist: updatedPlayList });
 
